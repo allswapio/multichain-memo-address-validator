@@ -1,0 +1,61 @@
+{
+  "name": "multichain-memo-address-validator",
+  "version": "1.0.0",
+  "description": "Zero-dependency mainnet address and checksum validator (EIP-55, Base58Check, Bech32/Bech32m, CashAddr, CRC16) for 12 address families, with a flag for families that use a memo or destination tag.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Haohang Network Technology Co., Limited (AllSwap) <service@allswap.io>",
+  "homepage": "https://allswap.io/tools/address-validator",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/allswapio/multichain-memo-address-validator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/allswapio/multichain-memo-address-validator/issues"
+  },
+  "keywords": [
+    "address-validator",
+    "crypto-address",
+    "checksum",
+    "eip-55",
+    "base58check",
+    "bech32",
+    "bech32m",
+    "cashaddr",
+    "destination-tag",
+    "memo",
+    "bitcoin",
+    "ethereum",
+    "solana",
+    "tron",
+    "ton",
+    "xrp",
+    "stellar",
+    "near"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "sideEffects": false,
+  "main": "./src/index.mjs",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.mjs",
+      "default": "./src/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src/",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

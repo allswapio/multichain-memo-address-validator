@@ -1,0 +1,68 @@
+# Publishes to npm when a version tag (v1.2.3) is pushed, using npm trusted
+# publishing (OIDC): no npm token is stored in this repository. npm generates
+# provenance automatically for a public package published this way from a
+# public repository, so package.json does not set publishConfig.provenance.
+#
+# First release: npm can only add a trusted publisher to a package that already
+# exists on the registry. Version 1.0.0 is therefore published once by a
+# maintainer from a clean checkout of the v1.0.0 tag, with 2FA:
+#
+#     npm test
+#     npm publish --access public      # npm asks for the one-time password
+#
+# (no provenance is attached to that version). Then, on npmjs.com, the
+# maintainer adds a trusted publisher for this package (GitHub Actions,
+# organisation "allswapio", this repository, workflow file "release.yml", no
+# environment), or runs `npm trust github <package> --file release.yml
+# --repo allswapio/<repository> --allow-publish` with npm 11.15.0 or later.
+# A new trusted publisher must be used within 2 days, so it is added when the
+# next version is ready. From the next version on, this workflow publishes.
+#
+# If the tagged version is already on npm (the hand-published 1.0.0), the job
+# runs the tests and stops without publishing.
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  id-token: write # required for npm trusted publishing (OIDC)
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          # Trusted publishing needs npm >= 11.5.1 and Node >= 22.14.0; Node 24 ships a compatible npm.
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+      - name: Check that the tag matches package.json
+        run: |
+          version="$(node -p 'require("./package.json").version')"
+          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package.json version ${version}" >&2
+            exit 1
+          fi
+      - run: npm --version
+      - run: npm test
+      - name: Check whether this version is already on npm
+        id: published
+        run: |
+          name="$(node -p 'require("./package.json").name')"
+          version="$(node -p 'require("./package.json").version')"
+          if npm view "${name}@${version}" version >/dev/null 2>&1; then
+            echo "already=true" >> "$GITHUB_OUTPUT"
+            echo "${name}@${version} is already on npm; nothing to publish."
+          else
+            echo "already=false" >> "$GITHUB_OUTPUT"
+          fi
+      - run: npm publish
+        if: steps.published.outputs.already != 'true'
