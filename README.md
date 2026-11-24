@@ -138,6 +138,10 @@ contract, system and genesis addresses, and deterministic re-encodings of publis
 
 Please report vulnerabilities privately to service@allswap.io. See [SECURITY.md](SECURITY.md).
 
+## License inquiries
+
+Questions about the licensing of this software or of anything it contains: service@allswap.io.
+
 ## License
 
 [MIT](LICENSE). Copyright (c) 2026 Haohang Network Technology Co., Limited (AllSwap).
